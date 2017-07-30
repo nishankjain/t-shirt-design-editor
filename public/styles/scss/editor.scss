@@ -1,0 +1,114 @@
+.design-canvas {
+	display: inline-block;
+	vertical-align: top;
+	min-width: 630px;
+	height: 600px;
+	background: white;
+	position: relative;
+	text-align: center;
+}
+
+.user-designs {
+	display: inline-block;
+	border-right: 3px solid #607D8B;
+	border-left: 3px solid #607D8B;
+	border-bottom: 3px solid #607D8B;
+	margin-right: 15px;
+	border-radius: 2px;
+	.user-designs-header {
+		background-color: #607D8B;
+		color: #ffffff;
+		font-weight: $bold;
+		padding: 7px 15px;
+		text-align: center;
+		margin: 0 -15px;
+	}
+}
+
+.user-design {
+	margin: 15px auto;
+	background-color: rgba(96, 125, 139, 0.67);
+	cursor: pointer;
+	&:hover {
+		background-color: #607D8B;
+	}
+	img {
+		width: 100%;
+	}
+}
+
+.shirt-canvas {
+	position: absolute;
+	min-width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+}
+
+.canvas-container {
+	margin: 0 auto;
+}
+
+.design-options {
+	margin-left: 15px;
+	border-right: 3px solid #607D8B;
+	border-left: 3px solid #607D8B;
+	border-bottom: 3px solid #607D8B;
+	border-radius: 2px;
+	.design-options-header {
+		background-color: #607D8B;
+		color: #ffffff;
+		font-weight: $bold;
+		padding: 7px 15px;
+		text-align: center;
+		margin: 0 -15px;
+	}
+}
+
+.design-editor-header {
+	background-color: #607D8B;
+	color: #ffffff;
+	font-weight: $bold;
+	padding: 15px;
+	text-align: center;
+	position: fixed;
+	width: 100%;
+	z-index: 1000;
+}
+
+.design-editor-body {
+	top: 65px;
+	position: relative;
+}
+
+.editor-actions {
+	margin: 15px 0;
+	ul {
+		list-style-type: none;
+		padding: 0;
+		margin: 0;
+		li {
+			text-align: center;
+			cursor: pointer;
+			p {
+				font-size: 10px;
+				margin: 0;
+				margin-top: -5px;
+			}
+		}
+	}
+}
+
+.add-options {
+	margin: 15px 0;
+}
+
+.add-image, .upload-image, .add-text {
+	text-align: center;
+	cursor: pointer;
+	p {
+		font-size: 10px;
+		margin: 0;
+		margin-top: -5px;
+	}
+}

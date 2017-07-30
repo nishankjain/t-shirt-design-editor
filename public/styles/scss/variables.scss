@@ -1,0 +1,36 @@
+// Import the required mixins
+@import 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700';
+// Font Weights
+$regular: 500;
+$medium: 600;
+$bold: 700;
+$extra-bold: 800;
+
+// Global Styles
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0;
+	padding: 0;
+}
+
+html, body {
+	margin: 0;
+	height: 100%;
+	font-family: 'Roboto';
+}
+
+.uppercase {
+	text-transform: uppercase;
+}
+
+.capitalize {
+	text-transform: capitalize;
+}
+
+.text-center {
+	text-align: center;
+}

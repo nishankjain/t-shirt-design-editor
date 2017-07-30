@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html ng-app='fp'>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0"/>
+	<base href="/">
+	<title>T-Shirt Design Editor</title>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+	<link href="//cdn.muicss.com/mui-0.9.20/css/mui.min.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" type="text/css" href="styles/master.css" />
+</head>
+<body ng-cloak ng-controller="mainController as mainCtrl">
+	<div class="design-editor-header mui--z1">T-Shirt Design Editor</div>
+	<div class="mui-container">
+		<div class="design-editor-body mui-row">
+			<div class="user-designs mui-col-md-2">
+				<div class="user-designs-header">My Designs</div>
+				<div class="user-design mui--z1">
+					<img src="/images/t-shirt.png">
+					<!-- <i class="material-icons">edit</i> -->
+				</div>
+				<div class="user-design mui--z1">
+					<img src="/images/t-shirt.png">
+				</div>
+			</div>
+			<div class="design-canvas mui--z2 mui-col-md-6">
+				<img src="/images/t-shirt.png">
+				<div class="shirt-canvas">
+					<canvas id='active-shirt' width="600" height="600"></canvas>
+				</div>
+			</div>
+			<div class="design-options mui-col-md-3" ng-show="mainCtrl.designId">
+				<div class="design-options-header">Editor Options</div>
+				<div class="editor-actions">
+					<ul class="mui-row">
+						<li class="mui-col-md-3" ng-click="mainCtrl.newDesign()">
+							<i class="material-icons">create_new_folder</i>
+							<p>New</p>
+						</li>
+						<li class="mui-col-md-3">
+							<i class="material-icons">save</i>
+							<p>Save</p>
+						</li>
+						<li class="mui-col-md-3">
+							<i class="material-icons">undo</i>
+							<p>Undo</p>
+						</li>
+						<li class="mui-col-md-3">
+							<i class="material-icons">redo</i>
+							<p>Redo</p>
+						</li>
+					</ul>
+				</div>
+				<div class="add-options mui-row">
+					<div class="add-image mui-col-md-6">
+						<div class="button" name="file" ngf-select='mainCtrl.getFile($file)' ng-model="mainCtrl.file" ngf-multiple="false" ngf-accept="'image/*'" ngf-pattern="'image/*'" ngf-max-size="10MB">
+							<i class="material-icons">add_a_photo</i>
+							<p>Add Image</p>
+						</div>
+					</div>
+					<div class="add-text mui-col-md-6">
+						<i class="material-icons">text_fields</i>
+						<p>Add Text</p>
+					</div>
+					<div class="upload-image mui-col-md-12" ng-click="mainCtrl.submit()" ng-if="mainCtrl.file">
+						<i class="material-icons">file_upload</i>
+						<p>Upload "{{mainCtrl.file.name}}"</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Scripts -->
+	<script type="text/javascript" src="lib/angular/angular.min.js"></script>
+	<script type="text/javascript" src="lib/ng-file-upload/ng-file-upload.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.17/fabric.min.js"></script>
+	<script type="text/javascript" src="scripts/app.js"></script>
+	<script type="text/javascript" src="scripts/model.js"></script>
+	<script type="text/javascript" src="scripts/service.js"></script>
+	<script type="text/javascript" src="scripts/controllers.js"></script>
+	<script type="text/javascript" src="scripts/directives.js"></script>
+	<script type="text/javascript" src="scripts/common.js"></script>
+	<script type="text/javascript" src="scripts/editor.js"></script>
+	<script src="//cdn.muicss.com/mui-0.9.20/js/mui.min.js"></script>
+</body>

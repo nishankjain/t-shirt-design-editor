@@ -1,0 +1,12 @@
+extends layout
+
+block content
+	h1= title
+	p Welcome to #{title}
+	form(ref='uploadForm'
+		id='uploadForm'
+		action='http://localhost:3000/api/uploadImages'
+		method='post'
+		encType="multipart/form-data")
+		input(type="file" name="photos" accept="image/*" multiple)
+		input(type='submit' value='Upload!')
