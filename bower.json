@@ -1,12 +1,12 @@
 {
   "name": "design-editor",
-  "description": "",
-  "main": "",
+  "description": "A design editor using fabric.js and angular.js to design t-shirts.",
+  "main": "index.html",
   "authors": [
-    "Nishank Jain <nishankiit@gmail.com>"
+    "Nishank Jain"
   ],
-  "license": "MIT",
-  "homepage": "",
+  "license": "ISC",
+  "homepage": "https://github.com/nishankjain/t-shirt-design-editor",
   "private": true,
   "ignore": [
     "**/.*",
@@ -20,5 +20,10 @@
     "angular": "^1.6.5",
     "mui": "^0.9.20",
     "ng-file-upload": "^12.2.13"
-  }
+  },
+  "keywords": [
+    "t-shirt-design",
+    "design-editor",
+    "fabricjs-example"
+  ]
 }
