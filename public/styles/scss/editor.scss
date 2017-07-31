@@ -23,6 +23,20 @@
 		text-align: center;
 		margin: 0 -15px;
 	}
+	// .user-designs-content {
+	// 	max-height: 600px;
+	// 	overflow: auto;
+	// 	&::-webkit-scrollbar {
+	// 		width: 5px;
+	// 	}
+	// 	&::-webkit-scrollbar-track {
+	// 		-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+	// 	}
+	// 	&::-webkit-scrollbar-thumb {
+	// 		background-color: darkgrey;
+	// 		outline: 1px solid slategrey;
+	// 	}
+	// }
 }
 
 .user-design {
@@ -113,9 +127,75 @@
 .add-image, .upload-image, .add-text {
 	text-align: center;
 	cursor: pointer;
+	@include css3-prefix('transition', 'all 0.25s ease-out');
+	border-radius: 2px;
 	p {
 		font-size: 10px;
 		margin: 0;
 		margin-top: -5px;
+	}
+}
+
+.add-image {
+	color: #757575;
+	&:hover {
+		background-color: #757575;
+		color: #ffffff;
+	}
+}
+
+.upload-image {
+	color: #293cc1;
+	&:hover {
+		background-color: #293cc1;
+		color: #ffffff;
+	}
+}
+
+.add-text {
+	color: #757575;
+	&:hover {
+		background-color: #757575;
+		color: #ffffff;
+	}
+}
+
+.new-design {
+	color: #83B114;
+	@include css3-prefix('transition', 'all 0.25s ease-out');
+	border-radius: 2px;
+	&:hover {
+		background-color: #83B114;
+		color: #ffffff;
+	}
+}
+
+.save-design {
+	color: #13aec7;
+	@include css3-prefix('transition', 'all 0.25s ease-out');
+	border-radius: 2px;
+	&:hover {
+		background-color: #13aec7;
+		color: #ffffff;
+	}
+}
+
+.last-step {
+	color: #0fcca9;
+	@include css3-prefix('transition', 'all 0.25s ease-out');
+	border-radius: 2px;
+	&:hover {
+		background-color: #0fcca9;
+		color: #ffffff;
+	}
+}
+
+.next-step {
+	color: #e8bb15;
+	@include css3-prefix('transition', 'all 0.25s ease-out');
+	border-radius: 2px;
+	&:hover {
+		background-color: #e8bb15;
+		color: #ffffff;
 	}
 }
