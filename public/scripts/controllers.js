@@ -28,11 +28,47 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 			.then(function (response) {
 				console.log(response);
 				mainCtrl.file = '';
+				mainCtrl.addImage(response.data.url.slice(6) + '/' + response.data.fileName);
 			}, function (err) {
 				console.log('Error: ' + err);
 			});
 		}
 	};
+
+	mainCtrl.placeholderText = "Space Pirate";
+	// mainCtrl.textBoxes = [];
+
+	mainCtrl.addImage = function (url) {
+		fabric.Image.fromURL(url, function(oImg) {
+			oImg.set({
+				class: 'image-overlay',
+				top: (mainCtrl.canvas.getHeight() / 2 - oImg.height / 2),
+				left: (mainCtrl.canvas.getWidth() / 2 - oImg.width / 2)
+			});
+			mainCtrl.canvas.add(oImg);
+			console.log(JSON.stringify(mainCtrl.canvas));
+		});
+	};
+
+	mainCtrl.addText = function () {
+		var text = new fabric.IText(mainCtrl.placeholderText, {
+			fontSize: 20,
+			fontFamily: 'Roboto'
+		});
+		text.set({
+			class: 'text-overlay',
+			top: (mainCtrl.canvas.getHeight() / 2 - text.height / 2),
+			left: (mainCtrl.canvas.getWidth() / 2 - text.width / 2)
+		});
+		// mainCtrl.textBoxes.push({
+		// 	content: mainCtrl.placeholderText
+		// });
+		mainCtrl.canvas.add(text);
+	};
+
+	// mainCtrl.updateDesignText = function (textBox) {
+	// 	console.log(textBox.content);
+	// };
 
 	mainCtrl.canvas = new fabric.Canvas('active-shirt');
 
@@ -43,85 +79,85 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 		ctx.rect(180, 120, 240, 400);
 	};
 
-	// fabric.Image.fromURL('/images/uploads/file-1501334826841.png', function(oImg) {
-	// 	oImg.set({
-	// 		class: 'design-overlay',
-	// 		top: (mainCtrl.canvas.getHeight() / 2 - oImg.height / 2),
-	// 		left: (mainCtrl.canvas.getWidth() / 2 - oImg.width / 2)
-	// 	});
-	// 	mainCtrl.canvas.add(oImg);
-	// });
-
 	mainCtrl.newDesign = function () {
 		RequestModel.createNewDesign(function (response) {
 			if (response.status === 200 && response.data.success) {
 				console.log(response);
 				mainCtrl.canvas.clear();
 				mainCtrl.designId = response.data.design.uuid;
+				if (typeof(Storage) !== "undefined") {
+					localStorage.setItem("designId", mainCtrl.designId);
+				}
+				clearLocalStorage();
 			}
 		});
 	};
 
-	mainCtrl.newDesign();
-}]);
+	var undoArray = [];
+	var redoArray = [];
 
-fpControllers.controller('loginController', ['$http', 'RequestModel', function($http, RequestModel) {
-	var loginCtrl = this;
-	
-	loginCtrl.signup = function () {
-		var signupData = {
-			email : this.signup_email,
-			first_name : this.signup_first_name,
-			last_name : this.signup_last_name,
-			contact : this.signup_contact,
-			password : this.signup_password
-		};
-		RequestModel.userSignup(signupData, function (response) {
-			if (response.status === 200 && response.data.success) {
-				var userToken = response.data.token;
-				setCookie('fb_com_ut', userToken, 30);
-				// window.location = '/home';
-			}
-		});
+	if (typeof(Storage) !== "undefined") {
+		if (localStorage.undoArray) {
+			undoArray = JSON.parse(localStorage.undoArray);
+		}
+		if (localStorage.redoArray) {
+			redoArray = JSON.parse(localStorage.redoArray);
+		}
+	}
+
+	function updateLocalStorage () {
+		if (typeof(Storage) !== "undefined") {
+			localStorage.setItem("undoArray", JSON.stringify(undoArray));
+			localStorage.setItem("redoArray", JSON.stringify(redoArray));
+		}
+		console.log(localStorage);
+	}
+
+	function clearLocalStorage () {
+		if (typeof(Storage) !== "undefined") {
+			localStorage.setItem("undoArray", "[]");
+			localStorage.setItem("redoArray", "[]");
+		}
+		console.log(localStorage);
+	}
+
+	mainCtrl.undo = function () {
+		redoArray.push(undoArray.pop());
+		updateLocalStorage();
 	};
 
-	loginCtrl.login = function () {
-		var loginData = {
-			email : this.login_email,
-			password : this.login_password
-		};
-		RequestModel.userLogin(loginData, function (response) {
-			if (response.status === 200 && response.data.success) {
-				var userToken = response.data.token;
-				setCookie('fb_com_ut', userToken, 30);
-				// window.location = '/home';
-			}
-		});
+	mainCtrl.redo = function () {
+		undoArray.push(redoArray.pop());
+		updateLocalStorage();
 	};
+
+	mainCtrl.canvas.on('object:modified', function () {
+		undoArray.push(JSON.stringify(mainCtrl.canvas));
+		redoArray.splice(0);
+		updateLocalStorage();
+	});
+
+	mainCtrl.canvas.on('object:added', function () {
+		undoArray.push(JSON.stringify(mainCtrl.canvas));
+		redoArray.splice(0);
+		updateLocalStorage();
+	});
+
+	if (undoArray.length < 1 || typeof(Storage) === "undefined") {
+		mainCtrl.newDesign();
+	}
+
+	if (typeof(Storage) !== "undefined") {
+		if (localStorage.designId) {
+			RequestModel.getDesign(localStorage.designId, function (response) {
+				if (response.status === 200 && response.data.success) {
+					console.log(response);
+					var designObj = response.data.design;
+					if (designObj.canvasData && designObj.canvasData !== null) {
+						mainCtrl.canvas.loadFromJSON(designObj.canvasData);
+					}
+				}
+			});
+		}
+	}
 }]);
-
-fpControllers.controller('editorController', ['$http', 'RequestModel', function($http, RequestModel) {
-	var feedCtrl = this;
-	feedCtrl.msg = "I've not been there";
-}]);
-
-// mainCtrl.newCanvasId = response.data.design.uuid;
-// $scope.$$postDigest(function () {
-// 	mainCtrl.canvas = new fabric.Canvas(mainCtrl.newCanvasId);
-// });
-// mainCtrl.canvas = new fabric.Canvas(mainCtrl.newCanvasId);
-// mainCtrl.canvas.controlsAboveOverlay = true;
-// mainCtrl.canvas.perPixelTargetFind = true;
-
-// mainCtrl.canvas.clipTo = function(ctx) {
-// 	ctx.rect(180, 120, 240, 400);
-// };
-
-// fabric.Image.fromURL('/images/uploads/file-1501334826841.png', function(oImg) {
-// 	oImg.set({
-// 		class: 'design-overlay',
-// 		top: (mainCtrl.canvas.getHeight() / 2 - oImg.height / 2),
-// 		left: (mainCtrl.canvas.getWidth() / 2 - oImg.width / 2)
-// 	});
-// 	mainCtrl.canvas.add(oImg);
-// });

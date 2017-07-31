@@ -30,7 +30,7 @@
 					<canvas id='active-shirt' width="600" height="600"></canvas>
 				</div>
 			</div>
-			<div class="design-options mui-col-md-3" ng-show="mainCtrl.designId">
+			<div class="design-options mui-col-md-3">
 				<div class="design-options-header">Editor Options</div>
 				<div class="editor-actions">
 					<ul class="mui-row">
@@ -42,11 +42,11 @@
 							<i class="material-icons">save</i>
 							<p>Save</p>
 						</li>
-						<li class="mui-col-md-3">
+						<li class="mui-col-md-3" ng-click="mainCtrl.undo()">
 							<i class="material-icons">undo</i>
 							<p>Undo</p>
 						</li>
-						<li class="mui-col-md-3">
+						<li class="mui-col-md-3" ng-click="mainCtrl.redo()">
 							<i class="material-icons">redo</i>
 							<p>Redo</p>
 						</li>
@@ -59,7 +59,7 @@
 							<p>Add Image</p>
 						</div>
 					</div>
-					<div class="add-text mui-col-md-6">
+					<div class="add-text mui-col-md-6" ng-click="mainCtrl.addText()">
 						<i class="material-icons">text_fields</i>
 						<p>Add Text</p>
 					</div>
@@ -68,6 +68,15 @@
 						<p>Upload "{{mainCtrl.file.name}}"</button>
 					</div>
 				</div>
+				<!-- <div class="add-options mui-row">
+					<div class="add-text mui-col-md-12" ng-click="mainCtrl.addText()">
+						<i class="material-icons">text_fields</i>
+						<p>Add Text</p>
+					</div>
+					<div class=" mui-col-md-12" ng-repeat="textBox in mainCtrl.textBoxes">
+						<textarea contenteditable="true" ng-model="textBox.content" ng-change="mainCtrl.updateDesignText(textBox)">{{textBox.content}}</textarea>
+					</div>
+				</div> -->
 			</div>
 		</div>
 	</div>

@@ -11,13 +11,15 @@ RequestModel = function ($http) {
 				cb(response);	// Failure callback
 			});
 		},
-		userLogin: function (data, cb) {
-			var url = 'api/login';
-			console.log(data);
+		getDesign: function (data, cb) {
+			var url = 'api/getdesign';
+			var dataString = {
+				uuid : data
+			};
 			$http({
 				method: 'POST',
 				url: url,
-				data: data
+				data: JSON.stringify(dataString)
 			}).then(function (response) {
 				cb(response);	// Success callback
 			}, function (response) {
