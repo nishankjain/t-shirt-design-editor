@@ -7,7 +7,6 @@ var bodyParser = require('body-parser');
 var sassCompiler 	= require('node-sass-middleware');
 
 var index = require('./routes/index');
-var users = require('./routes/users');
 var imageUpload = require('./routes/upload');
 
 var app = express();
@@ -37,7 +36,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', index);
-app.use('/users', users);
 app.use('/api', imageUpload);
 
 // catch 404 and forward to error handler

@@ -83,12 +83,12 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 		RequestModel.createNewDesign(function (response) {
 			if (response.status === 200 && response.data.success) {
 				mainCtrl.canvas.clear();
+				clearLocalStorage();
+				mainCtrl.makeNewDesign = true;
 				mainCtrl.designId = response.data.design.uuid;
 				if (typeof(Storage) !== "undefined") {
 					localStorage.setItem("designId", mainCtrl.designId);
 				}
-				clearLocalStorage();
-				mainCtrl.makeNewDesign = true;
 			}
 		});
 	};
@@ -181,7 +181,6 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 	}
 
 	mainCtrl.getDesign = function (designId) {
-		mainCtrl.designId = designId;
 		RequestModel.getDesign(designId, function (response) {
 			if (response.status === 200 && response.data.success) {
 				var designObj = response.data.design;
@@ -190,6 +189,7 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 					mainCtrl.loadedFromJSON = true;
 					mainCtrl.canvas.loadFromJSON(designObj.canvasData);
 					clearLocalStorage();
+					mainCtrl.designId = designId;
 				}
 				else if (undoArray.length > 0 && designId === localStorage.designId) {
 					mainCtrl.loadedFromJSON = true;
