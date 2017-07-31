@@ -16,11 +16,11 @@
 		<div class="design-editor-body mui-row">
 			<div class="user-designs mui-col-md-2">
 				<div class="user-designs-header">My Designs</div>
-				<div class="user-design mui--z1">
+				<div class="user-design mui--z1" ng-repeat="design in mainCtrl.userDesigns" ng-click="mainCtrl.getDesign(design.uuid)">
 					<img src="/images/t-shirt.png">
-					<!-- <i class="material-icons">edit</i> -->
+					<img ng-src="{{design.designUrl.slice(6)}}" class="design-image-overlay">
 				</div>
-				<div class="user-design mui--z1">
+				<div class="user-design mui--z1" ng-if="mainCtrl.userDesigns.length === 0 || mainCtrl.makeNewDesign">
 					<img src="/images/t-shirt.png">
 				</div>
 			</div>
@@ -38,7 +38,7 @@
 							<i class="material-icons">create_new_folder</i>
 							<p>New</p>
 						</li>
-						<li class="mui-col-md-3">
+						<li class="mui-col-md-3" ng-click="mainCtrl.save()">
 							<i class="material-icons">save</i>
 							<p>Save</p>
 						</li>

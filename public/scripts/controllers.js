@@ -4,6 +4,7 @@ var fpControllers = angular.module('fpControllers', []);
 
 fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '$scope', function($http, RequestModel, Upload, $scope) {
 	var mainCtrl = this;
+	mainCtrl.loadedFromJSON = false;
 	mainCtrl.submit = function() {
 		if (mainCtrl.file) {
 			mainCtrl.uploadFile(mainCtrl.file);
@@ -26,7 +27,6 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 				}
 			})
 			.then(function (response) {
-				console.log(response);
 				mainCtrl.file = '';
 				mainCtrl.addImage(response.data.url.slice(6) + '/' + response.data.fileName);
 			}, function (err) {
@@ -82,13 +82,13 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 	mainCtrl.newDesign = function () {
 		RequestModel.createNewDesign(function (response) {
 			if (response.status === 200 && response.data.success) {
-				console.log(response);
 				mainCtrl.canvas.clear();
 				mainCtrl.designId = response.data.design.uuid;
 				if (typeof(Storage) !== "undefined") {
 					localStorage.setItem("designId", mainCtrl.designId);
 				}
 				clearLocalStorage();
+				mainCtrl.makeNewDesign = true;
 			}
 		});
 	};
@@ -103,32 +103,63 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 		if (localStorage.redoArray) {
 			redoArray = JSON.parse(localStorage.redoArray);
 		}
+		if (localStorage.designId) {
+			mainCtrl.designId = localStorage.designId;
+		}
 	}
 
 	function updateLocalStorage () {
 		if (typeof(Storage) !== "undefined") {
 			localStorage.setItem("undoArray", JSON.stringify(undoArray));
 			localStorage.setItem("redoArray", JSON.stringify(redoArray));
+			localStorage.setItem("designId", mainCtrl.designId);
 		}
-		console.log(localStorage);
 	}
 
 	function clearLocalStorage () {
+		undoArray = [];
+		redoArray = [];
 		if (typeof(Storage) !== "undefined") {
 			localStorage.setItem("undoArray", "[]");
 			localStorage.setItem("redoArray", "[]");
+			localStorage.setItem("designId", "");
 		}
-		console.log(localStorage);
 	}
 
 	mainCtrl.undo = function () {
-		redoArray.push(undoArray.pop());
-		updateLocalStorage();
+		if (undoArray.length > 0) {
+			redoArray.push(undoArray.pop());
+			updateLocalStorage();
+			mainCtrl.canvas.clear();
+			mainCtrl.loadedFromJSON = true;
+			mainCtrl.canvas.loadFromJSON(undoArray[undoArray.length - 1]);
+		}
 	};
 
 	mainCtrl.redo = function () {
-		undoArray.push(redoArray.pop());
-		updateLocalStorage();
+		if (redoArray.length > 0) {
+			undoArray.push(redoArray.pop());
+			updateLocalStorage();
+			mainCtrl.canvas.clear();
+			mainCtrl.loadedFromJSON = true;
+			mainCtrl.canvas.loadFromJSON(undoArray[undoArray.length - 1]);
+		}
+	};
+
+	mainCtrl.save = function () {
+		var data = {
+			canvasData : JSON.stringify(mainCtrl.canvas),
+			designId : mainCtrl.designId,
+			imageData: mainCtrl.canvas.toDataURL()
+		};
+		console.log(mainCtrl.designId);
+		RequestModel.saveDesign(data, function (response) {
+			if (response.status === 200 && response.data.success) {
+				console.log(response);
+				mainCtrl.getAllDesigns();
+				mainCtrl.makeNewDesign = false;
+			}
+		});
 	};
 
 	mainCtrl.canvas.on('object:modified', function () {
@@ -138,26 +169,50 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 	});
 
 	mainCtrl.canvas.on('object:added', function () {
-		undoArray.push(JSON.stringify(mainCtrl.canvas));
-		redoArray.splice(0);
+		if (!mainCtrl.loadedFromJSON) {
+			undoArray.push(JSON.stringify(mainCtrl.canvas));
+			redoArray.splice(0);
+		}
 		updateLocalStorage();
 	});
 
-	if (undoArray.length < 1 || typeof(Storage) === "undefined") {
+	if (undoArray.length < 1 && !mainCtrl.designId) {
 		mainCtrl.newDesign();
 	}
 
+	mainCtrl.getDesign = function (designId) {
+		mainCtrl.designId = designId;
+		RequestModel.getDesign(designId, function (response) {
+			if (response.status === 200 && response.data.success) {
+				var designObj = response.data.design;
+				mainCtrl.canvas.clear();
+				if (designObj !== null && designObj.canvasData && designObj.canvasData !== null) {
+					mainCtrl.loadedFromJSON = true;
+					mainCtrl.canvas.loadFromJSON(designObj.canvasData);
+					clearLocalStorage();
+				}
+				else if (undoArray.length > 0 && designId === localStorage.designId) {
+					mainCtrl.loadedFromJSON = true;
+					mainCtrl.canvas.loadFromJSON(undoArray[undoArray.length - 1]);
+				}
+			}
+		});
+	};
+
 	if (typeof(Storage) !== "undefined") {
 		if (localStorage.designId) {
-			RequestModel.getDesign(localStorage.designId, function (response) {
-				if (response.status === 200 && response.data.success) {
-					console.log(response);
-					var designObj = response.data.design;
-					if (designObj.canvasData && designObj.canvasData !== null) {
-						mainCtrl.canvas.loadFromJSON(designObj.canvasData);
-					}
-				}
-			});
+			mainCtrl.getDesign(localStorage.designId);
 		}
 	}
+
+	mainCtrl.getAllDesigns = function () {
+		RequestModel.getAllDesigns(function (response) {
+			if (response.status === 200 && response.data.success) {
+				console.log(response.data.designs);
+				mainCtrl.userDesigns = response.data.designs;
+			}
+		});
+	};
+
+	mainCtrl.getAllDesigns();
 }]);

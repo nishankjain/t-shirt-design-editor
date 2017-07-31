@@ -29,12 +29,19 @@
 	margin: 15px auto;
 	background-color: rgba(96, 125, 139, 0.67);
 	cursor: pointer;
+	position: relative;
 	&:hover {
 		background-color: #607D8B;
 	}
 	img {
 		width: 100%;
 	}
+}
+
+.design-image-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
 }
 
 .shirt-canvas {
