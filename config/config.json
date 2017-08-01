@@ -10,7 +10,7 @@
 	},
 	"production": {
 		"database": "designeditor",
-		"host": "127.0.0.1",
+		"host": "./db.production.sqlite",
 		"dialect": "sqlite"
 	}
 }
