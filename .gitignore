@@ -13,3 +13,4 @@ public/images/uploads
 .sublime-project
 *.sublime-project
 *.sublime-workspace
+*.sqlite
