@@ -126,7 +126,11 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 				if (response.data.designs.length < 1) {
 					mainCtrl.newDesign();
 				}
-				else if (!mainCtrl.saveDesign) {
+				else {
+					mainCtrl.makeNewDesign = false;
+				}
+				
+				if (!mainCtrl.saveDesign) {
 					mainCtrl.getDesign(mainCtrl.userDesigns[0].uuid);
 				}
 			}
