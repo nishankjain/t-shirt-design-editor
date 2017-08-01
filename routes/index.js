@@ -23,7 +23,7 @@ router.get('/getalldesigns', function(req, res) {
 	}).then(function(designs) {
 		res.json({
 			success: true,
-			message: 'New design created',
+			message: 'All designs here',
 			designs: designs
 		});
 	});

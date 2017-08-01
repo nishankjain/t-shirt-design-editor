@@ -176,9 +176,9 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 		updateLocalStorage();
 	});
 
-	if (undoArray.length < 1 && !mainCtrl.designId) {
-		mainCtrl.newDesign();
-	}
+	// if (undoArray.length < 1 && !mainCtrl.designId) {
+	// 	mainCtrl.newDesign();
+	// }
 
 	mainCtrl.getDesign = function (designId) {
 		RequestModel.getDesign(designId, function (response) {
@@ -210,6 +210,11 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 			if (response.status === 200 && response.data.success) {
 				console.log(response.data.designs);
 				mainCtrl.userDesigns = response.data.designs;
+				if (response.data.designs.length < 1) {
+					if (undoArray.length < 1 && !mainCtrl.designId) {
+						mainCtrl.newDesign();
+					}
+				}
 			}
 		});
 	};
