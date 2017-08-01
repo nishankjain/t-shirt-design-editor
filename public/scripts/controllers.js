@@ -4,7 +4,8 @@ var fpControllers = angular.module('fpControllers', []);
 
 fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '$scope', function($http, RequestModel, Upload, $scope) {
 	var mainCtrl = this;
-	mainCtrl.loadedFromJSON = false;
+	mainCtrl.canvasLoaded = false;
+	mainCtrl.makeNewDesign = false;
 	mainCtrl.canvas = new fabric.Canvas('active-shirt');
 	mainCtrl.canvas.controlsAboveOverlay = true;
 	mainCtrl.canvas.perPixelTargetFind = true;
@@ -16,15 +17,17 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 	var undoArray = [];
 	var redoArray = [];
 
-	if (typeof(Storage) !== "undefined") {
-		if (localStorage.undoArray) {
-			undoArray = JSON.parse(localStorage.undoArray);
-		}
-		if (localStorage.redoArray) {
-			redoArray = JSON.parse(localStorage.redoArray);
-		}
-		if (localStorage.designId) {
-			mainCtrl.designId = localStorage.designId;
+	function setLocalVariables () {
+		if (typeof(Storage) !== "undefined") {
+			if (localStorage.undoArray) {
+				undoArray = JSON.parse(localStorage.undoArray);
+			}
+			if (localStorage.redoArray) {
+				redoArray = JSON.parse(localStorage.redoArray);
+			}
+			if (localStorage.designId) {
+				mainCtrl.designId = localStorage.designId;
+			}
 		}
 	}
 
@@ -39,11 +42,8 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 	function clearLocalStorage () {
 		undoArray = [];
 		redoArray = [];
-		if (typeof(Storage) !== "undefined") {
-			localStorage.setItem("undoArray", "[]");
-			localStorage.setItem("redoArray", "[]");
-			localStorage.setItem("designId", "");
-		}
+		mainCtrl.designId = "";
+		updateLocalStorage();
 	}
 
 	mainCtrl.submit = function() {
@@ -83,8 +83,8 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 				top: (mainCtrl.canvas.getHeight() / 2 - oImg.height / 2),
 				left: (mainCtrl.canvas.getWidth() / 2 - oImg.width / 2)
 			});
+			mainCtrl.canvasLoaded = false;
 			mainCtrl.canvas.add(oImg);
-			console.log(JSON.stringify(mainCtrl.canvas));
 		});
 	};
 
@@ -98,6 +98,7 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 			top: (mainCtrl.canvas.getHeight() / 2 - text.height / 2),
 			left: (mainCtrl.canvas.getWidth() / 2 - text.width / 2)
 		});
+		mainCtrl.canvasLoaded = false;
 		mainCtrl.canvas.add(text);
 	};
 
@@ -105,17 +106,15 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 		RequestModel.getDesign(designId, function (response) {
 			if (response.status === 200 && response.data.success) {
 				var designObj = response.data.design;
+				clearLocalStorage();
 				mainCtrl.canvas.clear();
-				if (designObj !== null && designObj.canvasData && designObj.canvasData !== null) {
-					mainCtrl.loadedFromJSON = true;
-					mainCtrl.canvas.loadFromJSON(designObj.canvasData);
-					clearLocalStorage();
-					mainCtrl.designId = designId;
+				mainCtrl.canvasLoaded = true;
+				mainCtrl.canvas.loadFromJSON(designObj.canvasData);
+				mainCtrl.designId = designId;
+				if (designObj.canvasData !== null) {
+					undoArray.push(designObj.canvasData);
 				}
-				else if (undoArray.length > 0 && designId === localStorage.designId) {
-					mainCtrl.loadedFromJSON = true;
-					mainCtrl.canvas.loadFromJSON(undoArray[undoArray.length - 1]);
-				}
+				updateLocalStorage();
 			}
 		});
 	};
@@ -123,14 +122,11 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 	mainCtrl.getAllDesigns = function () {
 		RequestModel.getAllDesigns(function (response) {
 			if (response.status === 200 && response.data.success) {
-				console.log(response.data.designs);
 				mainCtrl.userDesigns = response.data.designs;
 				if (response.data.designs.length < 1) {
-					if (undoArray.length < 1 && !mainCtrl.designId) {
-						mainCtrl.newDesign();
-					}
+					mainCtrl.newDesign();
 				}
-				else {
+				else if (!mainCtrl.saveDesign) {
 					mainCtrl.getDesign(mainCtrl.userDesigns[0].uuid);
 				}
 			}
@@ -140,13 +136,11 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 	mainCtrl.newDesign = function () {
 		RequestModel.createNewDesign(function (response) {
 			if (response.status === 200 && response.data.success) {
-				mainCtrl.canvas.clear();
 				clearLocalStorage();
-				mainCtrl.makeNewDesign = true;
+				mainCtrl.canvas.clear();
 				mainCtrl.designId = response.data.design.uuid;
-				if (typeof(Storage) !== "undefined") {
-					localStorage.setItem("designId", mainCtrl.designId);
-				}
+				mainCtrl.makeNewDesign = true;
+				updateLocalStorage();
 			}
 		});
 	};
@@ -156,7 +150,7 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 			redoArray.push(undoArray.pop());
 			updateLocalStorage();
 			mainCtrl.canvas.clear();
-			mainCtrl.loadedFromJSON = true;
+			mainCtrl.canvasLoaded = true;
 			mainCtrl.canvas.loadFromJSON(undoArray[undoArray.length - 1]);
 		}
 	};
@@ -166,7 +160,7 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 			undoArray.push(redoArray.pop());
 			updateLocalStorage();
 			mainCtrl.canvas.clear();
-			mainCtrl.loadedFromJSON = true;
+			mainCtrl.canvasLoaded = true;
 			mainCtrl.canvas.loadFromJSON(undoArray[undoArray.length - 1]);
 		}
 	};
@@ -177,12 +171,10 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 			designId : mainCtrl.designId,
 			imageData: mainCtrl.canvas.toDataURL()
 		};
-		console.log(mainCtrl.designId);
+		mainCtrl.saveDesign = true;
 		RequestModel.saveDesign(data, function (response) {
 			if (response.status === 200 && response.data.success) {
-				console.log(response);
 				mainCtrl.getAllDesigns();
-				mainCtrl.makeNewDesign = false;
 			}
 		});
 	};
@@ -194,11 +186,11 @@ fpControllers.controller('mainController', ['$http', 'RequestModel', 'Upload', '
 	});
 
 	mainCtrl.canvas.on('object:added', function () {
-		if (!mainCtrl.loadedFromJSON) {
+		if (!mainCtrl.canvasLoaded) {
 			undoArray.push(JSON.stringify(mainCtrl.canvas));
 			redoArray.splice(0);
+			updateLocalStorage();
 		}
-		updateLocalStorage();
 	});
 
 	mainCtrl.getAllDesigns();
