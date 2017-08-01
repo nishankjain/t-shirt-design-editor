@@ -1,20 +1,16 @@
 {
 	"development": {
-		"dialect": "mysql",
-		"storage": "./db.development.mysql",
-		"username": "root",
-		"password": null,
+		"dialect": "sqlite",
+		"storage": "./db.development.sqlite",
 		"database": "designeditor"
 	},
 	"test": {
-		"dialect": "mysql",
+		"dialect": "sqlite",
 		"storage": ":memory:"
 	},
 	"production": {
-		"username": "root",
-		"password": null,
-		"database": "database_production",
+		"database": "designeditor",
 		"host": "127.0.0.1",
-		"dialect": "mysql"
+		"dialect": "sqlite"
 	}
 }

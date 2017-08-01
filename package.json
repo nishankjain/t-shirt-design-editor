@@ -20,6 +20,7 @@
     "sequelize": "^4.4.2",
     "sequelize-cli": "^2.7.0",
     "serve-favicon": "~2.4.2",
+    "sqlite3": "^3.1.8",
     "uuid": "^3.1.0"
   },
   "description": "A design editor using fabric.js and angular.js to design t-shirts.",
